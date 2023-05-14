@@ -118,6 +118,23 @@ export class Japper {
     });
   }
 
+  public getPojo(table: string): Promise<string | null> {
+    const query = `select pojogen('${table}') as POJOGEN`;
+    const parameters = new Map([
+        ['TABLE', table],
+    ])
+    return new Promise<string>(async (success, failure) => {
+      this.getConnectionPool().query(query, [...parameters.values()], (err, rows) => {
+        if (err) {
+          this.log(err);
+          failure(err);
+        }
+        this.logResults(query, parameters, rows);
+        return success(rows[0].POJOGEN);
+      });
+    });
+  } 
+
   public getQueryCount<T>(sql: string, parameters: Map<string, any>): Promise<number> {
     const query = 'SELECT COUNT(1) as entityCount ' + sql.substring(sql.indexOf('FROM'));
     return new Promise<number>(async (success, failure) => {

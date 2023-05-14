@@ -5,16 +5,29 @@ import { Japper } from './japper';
 import { SEQUENCE_DATA, SEQUENCE_DATAMetadata } from './sequence-data';
 import { readFileSync } from 'fs';
 import path from 'path';
+import { MYSQL_TABLE } from './mysql-table';
 const readline = require('readline');
+const fs = require('fs');
+const url = require('url');
 
 export class JapperSetup {  
   
   private _japper:Japper;
   private _japperConfig:JapperConfig;
+  private _tablesPath:URL;
+  private _viewsPath:URL;
 
-  public constructor(config: JapperConfig){
+  public constructor(config: JapperConfig, tablesPath:string, viewsPath:string){
     this._japperConfig = config;
-    this._japper = new Japper(config);
+    this._japper = new Japper(config);    
+    if (!fs.existsSync(tablesPath)){
+        fs.mkdirSync(tablesPath);
+    }    
+    if (!fs.existsSync(viewsPath)){
+        fs.mkdirSync(viewsPath);
+    }
+    this._tablesPath = url.pathToFileURL(tablesPath) as URL;
+    this._viewsPath = url.pathToFileURL(viewsPath) as URL;
   }
 
   async isSequenceSetup(): Promise<boolean>{
@@ -73,12 +86,40 @@ export class JapperSetup {
     console.log('pojogen function created.');          
   }
 
+  async createPojos(): Promise<void>{    
+    const sql =
+        'select TABLE_NAME, TABLE_TYPE from information_schema.tables where table_schema = database();';
+    const tables = await this._japper.query<MYSQL_TABLE>(
+        sql,
+        new Map([])
+    );
+    for (const table of tables.filter(table => table.TABLE_TYPE === 'BASE TABLE' || table.TABLE_TYPE === 'VIEW')) {        
+        const pojo = await this._japper.getPojo(table.TABLE_NAME);
+        if (pojo){
+          console.log('Creating pojo for ' + table.TABLE_NAME);
+          const filename = `${table.TABLE_NAME.replace('_','-').trim().toLowerCase()}.ts`;
+          const tablePath = this._tablesPath.pathname + '/' + filename;
+          const viewPath = this._viewsPath.pathname + '/' + filename;
+          if (table.TABLE_TYPE === 'BASE TABLE') {
+            fs.writeFileSync(tablePath, pojo, { flag: 'w+' });
+          } else if (table.TABLE_TYPE === 'VIEW') {
+            fs.writeFileSync(viewPath, pojo, { flag: 'w+' });
+          }
+        }else{
+          console.log('Skipped pojo for ' + table.TABLE_NAME);
+        }
+    }
+  }
+
   async setupDb(){
     if ( !(await this.isSequenceSetup())){
       // Create table and functions
+      console.log('Setting DB up for first time');
       await this.createSequence();
+    }else{
+      console.log('DB set up for japper already.');
     }
-
+    await this.createPojos();
   }
 
 }
@@ -107,13 +148,18 @@ const main = async () => {
     port: 3306,
     verbose: false
   }
+  let tablesPath = '';
+  let viewsPath = '';
+  
   console.log('Please provide MySql credentials to set up database and create pojos');  
   japperConfig.host = await input("Host (example: 127.0.0.1): ");
-  japperConfig.schema = await input("Schema (example: myDb): ");
+  japperConfig.schema = await input("Schema (example: mySchema): ");
   japperConfig.username = await input("Username (example: myDbUser): ");
   japperConfig.password = await input("Password (example: myDbPwd): ");
   japperConfig.port = +(await input("Port (example: 3306): "));
-  const japperSetup = new JapperSetup(japperConfig);
+  tablesPath = await input("Folder for table pojos (example: /MyProject/tables): ");
+  viewsPath = await input("Folder for view pojos (example: /MyProject/view): ");
+  const japperSetup = new JapperSetup(japperConfig, tablesPath, viewsPath);
   await japperSetup.setupDb();
   console.log('Database sequence created and pojos generated. CTRL-C to exit.');  
   rl.close();
