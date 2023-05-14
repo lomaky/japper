@@ -83,7 +83,12 @@ export class JapperSetup {
     const pojogen = readFileSync(path.resolve(__dirname, './sql-scripts/pojogen.sql'), 'utf-8');
     console.log('Creating pojogen function...');
     await this._japper.queryExecute(pojogen, new Map([]));
-    console.log('pojogen function created.');          
+    console.log('pojogen function created.');
+    // Create Sequence functions: pojoviewgen
+    const pojoviewgen = readFileSync(path.resolve(__dirname, './sql-scripts/pojoviewgen.sql'), 'utf-8');
+    console.log('Creating pojoviewgen function...');
+    await this._japper.queryExecute(pojoviewgen, new Map([]));
+    console.log('pojoviewgen function created.');         
   }
 
   async createPojos(): Promise<void>{    
@@ -94,10 +99,11 @@ export class JapperSetup {
         new Map([])
     );
     for (const table of tables.filter(table => table.TABLE_TYPE === 'BASE TABLE' || table.TABLE_TYPE === 'VIEW')) {        
-        const pojo = await this._japper.getPojo(table.TABLE_NAME);
+        const isView = table.TABLE_TYPE === 'VIEW';
+        const pojo = await this._japper.getPojo(table.TABLE_NAME, isView);
         if (pojo){
           console.log('Creating pojo for ' + table.TABLE_NAME);
-          const filename = `${table.TABLE_NAME.replace('_','-').trim().toLowerCase()}.ts`;
+          const filename = `${table.TABLE_NAME.replace(/_/g,'-').trim().toLowerCase()}.ts`;
           const tablePath = this._tablesPath.pathname + '/' + filename;
           const viewPath = this._viewsPath.pathname + '/' + filename;
           if (table.TABLE_TYPE === 'BASE TABLE') {

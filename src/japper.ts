@@ -118,8 +118,9 @@ export class Japper {
     });
   }
 
-  public getPojo(table: string): Promise<string | null> {
-    const query = `select pojogen('${table}') as POJOGEN`;
+  public getPojo(table: string, isView: boolean): Promise<string | null> {
+    const pojogen = isView ? 'pojoviewgen' : 'pojogen'
+    const query = `select ${pojogen}('${table}') as POJOGEN`;
     const parameters = new Map([
         ['TABLE', table],
     ])
