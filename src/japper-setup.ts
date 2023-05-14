@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Connection, MysqlError, PoolConnection, createPool, Pool, PoolConfig } from 'mysql';
 import { JapperConfig } from './japper-config';
 import { Japper } from './japper';
 import { SEQUENCE_DATA, SEQUENCE_DATAMetadata } from './sequence-data';
