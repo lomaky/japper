@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/class-name */
+/* eslint-disable @typescript-eslint/no-empty */
 import { PojoMetadata } from "./pojo-metadata";
 
 export interface SEQUENCE_DATA {

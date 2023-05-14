@@ -3,7 +3,7 @@ import { JapperSetup } from "./japper-setup";
 
 const main = async () => {
   // This is an example to run without interactive command line
-  let japperConfig: JapperConfig = {
+  const japperConfig: JapperConfig = {
     host: '127.0.0.1',
     schema: 'mySchema',
     username: 'myUsername',
@@ -11,8 +11,8 @@ const main = async () => {
     port: 3306,
     verbose: false
   }
-  let tablesPath = '/Users/user1/Temp/tables';
-  let viewsPath = '/Users/user1/Temp/views';
+  const tablesPath = '/Users/user1/Temp/tables';
+  const viewsPath = '/Users/user1/Temp/views';
   
   const japperSetup = new JapperSetup(japperConfig, tablesPath, viewsPath);
   await japperSetup.setupDb();
