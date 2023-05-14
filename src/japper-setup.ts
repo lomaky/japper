@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/no-var-requires */
 
 import { JapperConfig } from './japper-config';
 import { Japper } from './japper';
