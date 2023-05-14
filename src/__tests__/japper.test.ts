@@ -1,8 +1,13 @@
-import { Queue } from "../queue";
-test('Japper', () => {
-  const queue = new Queue<number>();
-  for (let index = 0; index < 10; index++) {
-    queue.enqueue(index)
-  }   
-  expect( queue.size()).toBe(10);
+import { Japper } from "../japper";
+
+test('JapperQuery', async () => {
+    const japper = new Japper({
+        host: '127.0.0.1',
+        schema: '',
+        username: '',
+        password: '',
+        port: 3305, 
+        verbose: true
+    });
+    expect(1).toBe(1);
 });

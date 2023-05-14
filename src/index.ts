@@ -1,4 +1,3 @@
-import { DBMysql } from "./db-mysql";
 import { DBTransaction } from "./db-transaction";
 import { DBTransactionType } from "./db-transaction-type";
 import { Japper } from "./japper";
@@ -7,10 +6,9 @@ import { Queue } from "./queue";
 
 
 export {
-    Queue,      
-    DBMysql,
+    Queue,
     DBTransaction,
     DBTransactionType,
     PojoMetadata,
-    Japper    
+    Japper
 };

@@ -5,6 +5,4 @@ export interface PojoMetadata {
   getTableName(): string;
   getUpdatableFields(): string[];
   getInsertableFields(): string[];
-  mapToPatch(entity: any): any;
-  mergePatch(patch: any, entity: any): any;
 }
