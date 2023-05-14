@@ -60,9 +60,9 @@ export class JapperSetup {
 
     // // Create Sequence functions: log_bin_trust_function_creators
     try {
-      const log_bin_trust_function_creators = 'SET GLOBAL log_bin_trust_function_creators = 1'
+      const logBinTrustFunctionCreators = 'SET GLOBAL log_bin_trust_function_creators = 1'
       console.log('SET GLOBAL log_bin_trust_function_creators = 1');
-      await this._japper.queryExecute(log_bin_trust_function_creators, new Map([]));
+      await this._japper.queryExecute(logBinTrustFunctionCreators, new Map([]));
     } catch {}
     // Create Sequence functions: currval
     const currval = readFileSync(path.resolve(__dirname, './sql-scripts/currval.sql'), 'utf-8');
@@ -146,7 +146,7 @@ function input(prompt:string):Promise<string> {
     });
 }
 const main = async () => {
-  let japperConfig: JapperConfig = {
+  const japperConfig: JapperConfig = {
     host: '',
     schema: '',
     username: '',
