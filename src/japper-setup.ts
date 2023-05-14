@@ -65,7 +65,12 @@ export class JapperSetup {
     const setval = readFileSync(path.resolve(__dirname, './sql-scripts/setval.sql'), 'utf-8');
     console.log('Creating setval function...');
     await this._japper.queryExecute(setval, new Map([]));
-    console.log('setval function created.');        
+    console.log('setval function created.');  
+    // Create Sequence functions: pojogen
+    const pojogen = readFileSync(path.resolve(__dirname, './sql-scripts/pojogen.sql'), 'utf-8');
+    console.log('Creating pojogen function...');
+    await this._japper.queryExecute(pojogen, new Map([]));
+    console.log('pojogen function created.');          
   }
 
   async setupDb(){
@@ -73,6 +78,7 @@ export class JapperSetup {
       // Create table and functions
       await this.createSequence();
     }
+
   }
 
 }
