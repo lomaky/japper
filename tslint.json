@@ -5,8 +5,15 @@
         "no-var-requires": false,
         "no-empty": false,
         "no-shadowed-variable": false,
-        "class-name": "off",
-        "variable-name": "off",
+        "class-name": false,
+        "variable-name": {
+            "options": [
+                "ban-keywords",
+                "check-format",
+                "allow-leading-underscore",
+                "allow-pascal-case"
+            ]
+        },
         "prefer-const": "off"
     }
 }
