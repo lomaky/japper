@@ -7,31 +7,30 @@ import { PojoMetadata } from './pojo-metadata';
 import { Queue } from './queue';
 
 export class Japper {
-
   private _pool: Pool;
   private _maxNumberCachedIds: number = 500;
   private _IDs = new Queue<number>();
   private _sequenceId = 'ID_SEQ';
   private _getIdentitySql = "SELECT nextval('" + this._sequenceId + "') as nextval";
   private _verbose = false;
-  
-  public constructor(config: JapperConfig){
-      const dbConfigMySql = {
-        host: config.host,
-        user: config.username,
-        password: config.password,
-        database: config.schema,
-        port: config.port,
-        connectionLimit: 15,
-        queueLimit: 30,
-        acquireTimeout: 1000000,
-      } as PoolConfig;
-      this._pool = createPool(dbConfigMySql);
-      this._verbose = config.verbose;
+
+  public constructor(config: JapperConfig) {
+    const dbConfigMySql = {
+      host: config.host,
+      user: config.username,
+      password: config.password,
+      database: config.schema,
+      port: config.port,
+      connectionLimit: 15,
+      queueLimit: 30,
+      acquireTimeout: 1000000,
+    } as PoolConfig;
+    this._pool = createPool(dbConfigMySql);
+    this._verbose = config.verbose;
   }
 
-  private log(message: any){
-    if (this._verbose){
+  private log(message: any) {
+    if (this._verbose) {
       this.log(message);
     }
   }
@@ -119,11 +118,9 @@ export class Japper {
   }
 
   public getPojo(table: string, isView: boolean): Promise<string | null> {
-    const pojogen = isView ? 'pojoviewgen' : 'pojogen'
+    const pojogen = isView ? 'pojoviewgen' : 'pojogen';
     const query = `select ${pojogen}('${table}') as POJOGEN`;
-    const parameters = new Map([
-        ['TABLE', table],
-    ])
+    const parameters = new Map([['TABLE', table]]);
     return new Promise<string>(async (success, failure) => {
       this.getConnectionPool().query(query, [...parameters.values()], (err, rows) => {
         if (err) {
@@ -134,7 +131,7 @@ export class Japper {
         return success(rows[0].POJOGEN);
       });
     });
-  } 
+  }
 
   public getQueryCount<T>(sql: string, parameters: Map<string, any>): Promise<number> {
     const query = 'SELECT COUNT(1) as entityCount ' + sql.substring(sql.indexOf('FROM'));
@@ -216,11 +213,7 @@ export class Japper {
     return idListStr;
   }
 
-  public getEntitiesByReferenceIds<T>(
-    metadata: PojoMetadata,
-    referenceIdName: string,
-    ids: number[],
-  ): Promise<T[]> {
+  public getEntitiesByReferenceIds<T>(metadata: PojoMetadata, referenceIdName: string, ids: number[]): Promise<T[]> {
     const query =
       'SELECT * FROM ' + metadata.getTableName() + ' WHERE ' + referenceIdName + ' IN ' + this.getIdListForQuery(ids);
 
@@ -252,7 +245,7 @@ export class Japper {
   }
 
   public logResults(query: string, parameters: Map<string, any> | null, rows: any): void {
-    if (this._verbose){
+    if (this._verbose) {
       console.debug('query: ' + query);
       if (parameters) {
         console.debug('parameters:' + [...parameters.values()]);
