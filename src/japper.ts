@@ -3,7 +3,7 @@ import { Connection, MysqlError, PoolConnection } from 'mysql';
 import { DBTransactionType } from './db-transaction-type';
 import { DBTransaction } from './db-transaction';
 import { PojoMetadata } from './pojo-metadata';
-import { DBMysql } from './databases/db-mysql';
+import { DBMysql } from './db-mysql';
 import { Queue } from './queue';
 
 export class Japper {

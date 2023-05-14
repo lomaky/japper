@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { createPool, Pool, PoolConfig } from 'mysql';
-import { Queue } from '../queue';
+import { Queue } from './queue';
+
 
 export class DBMysql {
   private static pool: Pool;
