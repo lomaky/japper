@@ -20,6 +20,11 @@
     "dapper",
     "orm",
     "mysql",
+    "typescript",
+    "mapper",
+    "database",
+    "crud",
+    "simplecrud",
     "nodejs"
   ],
   "author": "Oscar Galvis",
