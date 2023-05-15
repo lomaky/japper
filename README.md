@@ -13,13 +13,13 @@ A simple object mapper and CRUD helper for Mysql/Nodejs on top of [mysql](https:
 
 ## Usage
 
-#### Example
+#### Initialization
 
 ```typescript
 import { Japper } from "japper-mysql";
 import { JapperConfig } from "japper-mysql/lib/japper-config";
 
-const main = async () => {  
+const main = async () => {
   const config: JapperConfig = {
     host: '127.0.0.1',
     schema: 'db',
@@ -27,23 +27,77 @@ const main = async () => {
     password: 'pwd',
     port: 3306,
     verbose: false,
-  };  
+  };
   const japper = new Japper(config);
-  
-  const users = await japper.getEntities<User>(
-    new UserMetadata(), 
-    new Map([['deleted', 0]])
-  );
-  users.forEach(u => console.log(u.email));
 };
 ```
-Output:
-```bash
-email1@email.com
-email3@email.com
-email2@email.com
+##### Get db entity by Id
+Example: Get user with Id = 1000
+```typescript
+const user = await japper.getEntityById<User>(
+  new UserMetadata(), 1000
+);
 ```
 
+##### Create new db entity
+Example: Create new user with sequential id
+```typescript
+const user:User = {
+  id: await japper.getId(),
+  email: 'email1@email.com',
+  deleted: 0,
+  created_date: new Date()
+};
+await japper.add(new UserMetadata(), user);
+```
+
+##### Update db entity
+Example: Update user email with Id = 1000
+```typescript
+const user = await japper.getEntityById<User>(
+  new UserMetadata(), 1000
+);
+user.email = 'email2@email.com';
+await japper.update(new UserMetadata(), user);
+```
+
+##### Delete db entity
+Example: Delete user with Id = 1000
+```typescript
+const user = await japper.getEntityById<User>(
+  new UserMetadata(), 1000
+);
+await japper.delete(new UserMetadata(), user);
+```
+
+##### Get multiple db entities
+Example: Get all inactive and not deleted users
+```typescript
+const users = await japper.getEntities<User>(
+  new UserMetadata(),
+  new Map([
+	['active', 0],
+	['deleted', 1],
+  ])
+);
+```
+Example: Get all groups with users in the list
+```typescript
+const groups = await japper.getEntitiesByIds<Group>(
+    new GroupMetadata(),
+    users.map(({ group_id }) => group_id)
+);
+```
+Example: Get count of all inactive and not deleted users
+```typescript
+const count = await japper.getEntitiesCount<User>(
+  new UserMetadata(),
+  new Map([
+	['active', 0],
+	['deleted', 1],
+  ])
+);
+```
 ## Installation
 
 ```bash

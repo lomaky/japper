@@ -8,7 +8,7 @@ import { Queue } from './queue';
 
 export class Japper {
   private _pool: Pool;
-  private _maxNumberCachedIds: number = 500;
+  private _maxNumberCachedIds: number = 99;
   private _IDs = new Queue<number>();
   private _sequenceId = 'ID_SEQ';
   private _getIdentitySql = "SELECT nextval('" + this._sequenceId + "') as nextval";
@@ -49,7 +49,7 @@ export class Japper {
     throw new Error('Unable to obtain ID');
   }
 
-  public async getNextSeqId(): Promise<number> {
+  private async getNextSeqId(): Promise<number> {
     this.log('query: ' + this._getIdentitySql);
     return new Promise<number>(async (success, failure) => {
       this.getConnectionPool().query(this._getIdentitySql, (err, rows) => {
@@ -164,14 +164,10 @@ export class Japper {
     });
   }
 
-  public getEntityById<T>(metadata: PojoMetadata, entityId: number, userId: number | undefined): Promise<T> {
+  public getEntityById<T>(metadata: PojoMetadata, entityId: number): Promise<T> {
     let query = 'SELECT * FROM ' + metadata.getTableName() + ' WHERE ID = ? ';
-    if (userId) {
-      query += ' AND USER_ID = ?';
-    }
     const parameters = new Map([
-      ['ID', entityId],
-      ['USER_ID', userId],
+      ['ID', entityId]
     ]);
 
     return new Promise<T>(async (success, failure) => {
@@ -244,7 +240,7 @@ export class Japper {
     });
   }
 
-  public logResults(query: string, parameters: Map<string, any> | null, rows: any): void {
+  private logResults(query: string, parameters: Map<string, any> | null, rows: any): void {
     if (this._verbose) {
       console.debug('query: ' + query);
       if (parameters) {
