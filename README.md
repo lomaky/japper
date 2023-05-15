@@ -2,14 +2,10 @@
 
 <span class="badge-npmversion"><a href="https://www.npmjs.com/package/japper-mysql" title="View this project on NPM"><img src="https://img.shields.io/npm/v/japper.svg" alt="NPM version" /></a></span>
 
-Who wants to write basic read/insert/update/delete statements? 
+Who wants to write basic select/insert/update/delete statements?
 
 A simple object mapper and CRUD helper for Mysql/Nodejs on top of [mysql](https://www.npmjs.com/package/mysql) built with typescript, heavily inspired by [Dapper](https://github.com/DapperLib/Dapper) and [Dapper.SimpleCRUD](https://github.com/ericdc1/Dapper.SimpleCRUD).
 
-## Features
-
-- TODO
-- 
 
 ## Usage
 
@@ -46,6 +42,7 @@ const user:User = {
   id: await japper.getId(),
   email: 'email1@email.com',
   deleted: 0,
+  active: 1,
   created_date: new Date()
 };
 await japper.add(new UserMetadata(), user);
@@ -88,6 +85,26 @@ const groups = await japper.getEntitiesByIds<Group>(
     users.map(({ group_id }) => group_id)
 );
 ```
+Example: Get all groups with role_id 1, 2 and 3
+```typescript
+const groups = await japper.getEntitiesByReferenceIds<Group>(
+    new GroupMetadata(),
+    'role_id',
+    [1, 2, 3]
+);
+```
+Example: Custom queries
+```typescript
+const sql = 'select * from User where created_date > ? and active = ?';
+const users = await japper.query<User>(
+    sql,
+    new Map([
+      ['created_date', new Date().toISOString()],
+      ['active', '0'],
+    ])
+);
+```
+##### Count
 Example: Get count of all inactive and not deleted users
 ```typescript
 const count = await japper.getEntitiesCount<User>(
@@ -98,6 +115,29 @@ const count = await japper.getEntitiesCount<User>(
   ])
 );
 ```
+##### Multiple database transactions
+Example: Mark as deleted all inactive users and update realted groups updated date to now.
+```typescript
+const users = await japper.getEntities<User>(
+  new UserMetadata(),
+  new Map([['active', 0]])
+);
+const groups = await japper.getEntitiesByIds<Group>(
+    new GroupMetadata(),
+    users.map(({ group_id }) => group_id)
+);
+const operations = new Queue<DBTransaction>();
+for (const group of groups) {
+  group.updated = new Date();
+  operations.enqueue(new DBTransaction(DBTransactionType.Update, new GroupMetadata(), group));  
+}
+for (const user of users) {
+  user.deleted = 1;
+  operations.enqueue(new DBTransaction(DBTransactionType.Update, new UserMetadata(), user));
+}
+await japper.executeTransaction(operations);
+```
+
 ## Installation
 
 ```bash
