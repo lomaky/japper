@@ -41,6 +41,7 @@ begin
 		END IF;
 		if     dat_type like 'decimal'   and nul_col like 'YES'  	then set p_type := 'number | null';
 		ELSEIF dat_type like 'decimal'                              then set p_type := 'number';
+        ELSEIF dat_type like 'int'                                  then set p_type := 'number';
 		ELSEIF dat_type like 'datetime' and nul_col like 'YES'  	then set p_type := 'Date | null';
 		ELSEIF dat_type like 'datetime'                             then set p_type := 'Date';    
 		ELSEIF nul_col like 'YES' 			    					then set p_type := 'string | null';
