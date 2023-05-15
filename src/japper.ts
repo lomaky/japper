@@ -166,9 +166,7 @@ export class Japper {
 
   public getEntityById<T>(metadata: PojoMetadata, entityId: number): Promise<T> {
     const query = 'SELECT * FROM ' + metadata.getTableName() + ' WHERE ID = ? ';
-    const parameters = new Map([
-      ['ID', entityId]
-    ]);
+    const parameters = new Map([['ID', entityId]]);
 
     return new Promise<T>(async (success, failure) => {
       this.getConnectionPool().query(query, [...parameters.values()], (err, rows) => {
